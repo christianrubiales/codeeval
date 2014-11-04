@@ -8,9 +8,9 @@ public class MultiplesOfANumber {
 	public static void main(String[] args) throws IOException {
 		BufferedReader br = new BufferedReader(new FileReader(args[0]));
 		
-		String line;
-		while ((line = br.readLine()) != null) {
-			String[] a = line.split(",");
+		String s;
+		while ((s = br.readLine()) != null) {
+			String[] a = s.split(",");
 			int x = Integer.parseInt(a[0]);
 			int m = Integer.parseInt(a[1]);
 			int n = m;
