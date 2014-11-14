@@ -3,9 +3,9 @@
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.List;
 
 public class LevenshteinDistance {
 
@@ -13,34 +13,30 @@ public class LevenshteinDistance {
 		BufferedReader br = new BufferedReader(new FileReader(args[0]));
 		
 		String l;
-		Map<String, HashSet<String>> M = null;
+		List<String> l1 = new ArrayList<String>();
+		List<String> l2 = new ArrayList<String>();
+		boolean b = false;
 		while ((l = br.readLine()) != null) {
-			if (M == null) {
-				M = new LinkedHashMap<String, HashSet<String>>();
+			if (l.equals("END OF INPUT")) {
+				b = true;
+				continue;
 			}
 			
-			if (l.equals("END OF INPUT")) {
-				for (String i : M.keySet()) {
-					for (String j : M.keySet()) {
-						if (!i.equals(j)) {
-							if (f(i,j) == 1) {
-								M.get(i).add(j);
-								M.get(j).add(i);
-							}
-						}
-					}
-				}
-				for (String i : M.keySet()) {
-					System.out.println(M.get(i).size() + 1);
-				}
-				M = null;
+			if (b) {
+				l2.add(l);
 			} else {
-				HashSet<String> s = M.get(l);
-				if (s == null) {
-					s = new HashSet<String>();
-					M.put(l, s);
-				}	
+				l1.add(l);
 			}
+		}
+		
+		for (String h : l1) {
+			HashSet<String> m = new HashSet<String>();
+			for (String i : l2) {
+				if (f(h,i) == 1) {
+					m.add(i);
+				}
+			}
+			System.out.println(m.size() + 1);
 		}
 	}
 
