@@ -1,8 +1,6 @@
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Scanner;
 
 
@@ -19,88 +17,65 @@ public class DetectingCycles {
 				y[i] = Integer.parseInt(x[i]);
 			}
 			
-			int[] lm = b(y, 1);
+			boolean f = false;
+			int[] y1, y2;
+			for (int i = 1; i < y.length/2; i++) {// length of substring
+				if (f) {
+					break;
+				}
+				for (int j = 0; j < y.length - i; j++) {// starting
+					y1 = Arrays.copyOfRange(y, j, i+j);
+					y2 = Arrays.copyOfRange(y, j+i, y.length);
+					if (c(y2, d(y1))) {
+						y = y1;
+						f = true;
+						break;
+					}
+				}
+			}
 			
 			StringBuffer u = new StringBuffer();
-			for (int i = 0; i < lm[0]; i++) {
-				u.append(y[lm[1] + i]).append(' ');
+			for (int i = 0; i < y.length; i++) {
+				u.append(y[i]);
+				if (i < y.length - 1) {
+					u.append(' ');
+				}
 			}
-			System.out.println(u.toString().trim());
+			System.out.println(u.toString());
 		}
 	}
 	
 	/**
-	 * Brent's cycle-finding algorithm/teleporting turtle
-	 * @return int[] where int[0] = lambda, int[1] = mu
+	 * contains
 	 */
-	public static int[] b(int[] a, int x0) {
-		int[] lm = new int[]{0,0};
-		int p = 1; //power
-		lm[0] = p;
-		// t = tortoise, h = hare
-		int t = x0, h = f(a, x0);
+	public static boolean c(int[] a, int[] b) {
+		boolean c = false;
 		
-		while (t != h) {
-			if (p == lm[0]) {
-				t = h;
-				p *= 2;
-				lm[0] = 0;
+		for (int i = 0; i <= a .length - b.length; i++) {
+			int d = 0;
+			for (int j = 0; j < b .length; j++) {
+				if (a[i+j] == b[j]) {
+					d++;
+				}
 			}
-			h = f(a, h);
-			lm[0] = ++lm[0];
+			if (d > 0 && d == b.length) {
+				c = true;
+				break;
+			}
 		}
 		
-		lm[1] = 0;
-		t = x0;
-		h = x0;
-		
-		for (int i = 0; i < lm[0]; i++) {
-			h = f(a, h);
-		}
-
-		while (t != h) {
-			t = f(a, t);
-			h = f(a, h);
-			lm[1] = ++lm[1];
-		}
-		
-		return lm;
+		return c;
 	}
 	
 	/**
-	 * Floyd's cycle-finding algorithm/tortoise and hare
-	 * @return int[] where int[0] = lambda, int[1] = mu
+	 * double the array
 	 */
-	public static int[] floyd(int[] a, int x0) {
-		int[] lm = new int[]{0,0};
-		
-		// t = tortoise, h = hare
-		int t = f(a, x0), h = f(a, f(a, x0));
-
-		while (t != h) {
-			t = f(a, t);
-			h = f(a, f(a, h));
+	public static int[] d(int[] a) {
+		int[] b = new int[2*a.length];
+		for (int i = 0; i < a .length; i++) {
+			b[i] = a[i];
+			b[a .length + i] = a[i];
 		}
-		
-		lm[1] = 0;
-		t = x0;
-		while (t != h) {
-			t = f(a, t);
-			h = f(a, h);
-			lm[1] = ++lm[1];
-		}
-		
-		lm[0] = 1;
-		h = f(a, t);
-		while (t != h) {
-			h = f(a, h);
-			lm[0] = ++lm[0];
-		}
-		
-		return lm;
-	}
-	
-	public static int f(int[] a, int p) {
-		return a[p];
+		return b;
 	}
 }
