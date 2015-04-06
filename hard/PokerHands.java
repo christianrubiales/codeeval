@@ -27,14 +27,14 @@ public class PokerHands {
 			Arrays.sort(L);
 			Arrays.sort(R);
 			
-			int r1 = rank(L);
-			int r2 = rank(R);
+			int[] r1 = rank(L);
+			int[] r2 = rank(R);
 			
-			if (r1 > r2) {
+			if (r1[0] > r2[0]) {
 				System.out.println("left");
-			} else if (r2 > r1) {
+			} else if (r2[0] > r1[0]) {
 				System.out.println("right");
-			} else if (r1 == 1 && r2 == 1) {
+			} else if (r1[0] == 1 && r2[0] == 1) {
 				if (hi(L) > hi(R)) {
 					System.out.println("left");
 				} else if (hi(R) > hi(L)) {
@@ -82,66 +82,77 @@ public class PokerHands {
 		return h;
 	}
 	
-	public static int rank(String[] h) {
-		if (RF(h)) {
-			return 10;
-		} else if (SF(h)) {
-			return 9;
-		} else if (FK(h)) {
-			return 8;
-		} else if (FH(h)) {
-			return 7;
-		} else if (F(h)) {
-			return 6;
-		} else if (S(h)) {
-			return 5;
-		} else if (TK(h)) {
-			return 4;
-		} else if (TP(h)) {
-			return 3;
-		} else if (OP(h)) {
-			return 2;
+	public static int[] rank(String[] h) {
+		int[] r;
+		if ((r = RF(h))[0] == 10) {
+			return r;
+		} else if ((r = SF(h))[0] == 9) {
+			return r;
+		} else if ((r = FK(h))[0] == 8) {
+			return r;
+		} else if ((r = FH(h))[0] == 7) {
+			return r;
+		} else if ((r = F(h))[0] == 6) {
+			return r;
+		} else if ((r = S(h))[0] == 5) {
+			return r;
+		} else if ((r = TK(h))[0] == 4) {
+			return r;
+		} else if ((r = TP(h))[0] == 3) {
+			return r;
+		} else if ((r = OP(h))[0] == 2) {
+			return r;
 		}
 		
-		return 1;
+		return r;
 	}
 	
 	// Royal Flush: Ten, Jack, Queen, King, Ace, in same suit.
-	public static boolean RF(String[] h) {
+	public static int[] RF(String[] h) {
+		int[] r = new int[2];
+		r[0] = -1;
 		char suit = h[0].charAt(1);
 		
 		if (h[0].charAt(0) == 'J' && h[1].charAt(0) == 'K' && h[2].charAt(0) == 'L' && h[3].charAt(0) == 'M' && h[4].charAt(0) == 'N') {
 			for (String s : h) {
 				if (s.charAt(1) != suit) {
-					return false;
+					return r;//false
 				}
 			}
-			return true;
+			r[0] = 10;
+			r[1] = 'N';
+			return r;//true
 		}
 		
-		return false;
+		return r;//false
 	}
 
 	// Straight Flush: All cards are consecutive values of same suit.
-	public static boolean SF(String[] h) {
+	public static int[] SF(String[] h) {
+		int[] r = new int[2];
+		r[0] = -1;
 		char suit = h[0].charAt(1);
 		for (String s : h) {
 			if (s.charAt(1) != suit) {
-				return false;
+				return r;//false
 			}
 		}
 		char c = h[0].charAt(0);
 		for (int i = 1; i < 5; i++) {
 			if (h[i].charAt(0) != Character.valueOf((char) (i + c))) {
-				return false;
+				return r;//false
 			}
 		}
 		
-		return true;
+		r[0] = 9;
+		r[1] = h[4].charAt(0);
+		return r;//true
 	}
 	
 	// Four of a Kind: Four cards of the same value.
-	public static boolean FK(String[] h) {
+	public static int[] FK(String[] h) {
+		int[] r = new int[2];
+		r[0] = -1;
 		Map<Character, Integer> m = new HashMap<Character, Integer>();
 		Integer i;
 		for (String s : h) {
@@ -153,11 +164,21 @@ public class PokerHands {
 			m.put(s.charAt(0), i);
 		}
 		
-		return m.containsValue(4);
+		for (Character c : m.keySet()) {
+			if (m.get(c) == 4) {
+				r[0] = 8;
+				r[1] = c;
+				break;
+			}
+		}
+		
+		return r;
 	}
 	
 	// Full House: Three of a kind and a pair.
-	public static boolean FH(String[] h) {
+	public static int[] FH(String[] h) {
+		int[] r = new int[2];
+		r[0] = -1;
 		Map<Character, Integer> m = new HashMap<Character, Integer>();
 		Integer i;
 		for (String s : h) {
@@ -174,40 +195,57 @@ public class PokerHands {
 			l.addAll(m.values());
 			
 			if ((l.get(0) == 3 && l.get(1) == 2) || (l.get(0) == 2 && l.get(1) == 3)) {
-				return true;
+				r[0] = 7;
+				
+				for (Character c : m.keySet()) {
+					if (m.get(c) == 3) {
+						r[1] = c;
+						return r;//true
+					}
+				}
 			}
 		}
 		
-		return false;
+		return r;//false
 	}
 
 	// Flush: All cards of the same suit.
-	public static boolean F(String[] h) {
+	public static int[] F(String[] h) {
+		int[] r = new int[2];
+		r[0] = -1;
 		char suit = h[0].charAt(1);
 		
 		for (String s : h) {
 			if (s.charAt(1) != suit) {
-				return false;
+				return r;//false
 			}
 		}
 		
-		return true;
+		r[0] = 6;
+		r[1] = h[4].charAt(0);
+		return r;//true
 	}
 
 	// Straight: All cards are consecutive values.
-	public static boolean S(String[] h) {
+	public static int[] S(String[] h) {
+		int[] r = new int[2];
+		r[0] = -1;
 		char c = h[0].charAt(0);
 		for (int i = 1; i < 5; i++) {
 			if (h[i].charAt(0) != Character.valueOf((char) (i + c))) {
-				return false;
+				return r;//false
 			}
 		}
-		
-		return true;
+
+		r[0] = 5;
+		r[1] = h[4].charAt(0);
+		return r;//true
 	}
 
 	// Three of a Kind: Three cards of the same value.
-	public static boolean TK(String[] h) {
+	public static int[] TK(String[] h) {
+		int[] r = new int[2];
+		r[0] = -1;
 		Map<Character, Integer> m = new HashMap<Character, Integer>();
 		Integer i;
 		for (String s : h) {
@@ -219,11 +257,21 @@ public class PokerHands {
 			m.put(s.charAt(0), i);
 		}
 		
-		return m.containsValue(3);
+		for (Character c : m.keySet()) {
+			if (m.get(c) == 3) {
+				r[0] = 4;
+				r[1] = c;
+				break;
+			}
+		}
+		
+		return r;
 	}
 
 	// Two Pairs: Two different pairs.
-	public static boolean TP(String[] h) {
+	public static int[] TP(String[] h) {
+		int[] r = new int[2];
+		r[0] = -1;
 		Map<Character, Integer> m = new HashMap<Character, Integer>();
 		Integer i;
 		for (String s : h) {
@@ -235,18 +283,28 @@ public class PokerHands {
 			m.put(s.charAt(0), i);
 		}
 		int c = 0;
-		
 		for (Integer j : m.values()) {
 			if (j == 2) {
 				c++;
 			}
 		}
 		
-		return c == 2;
+		if (c == 2) {
+			int x = 0;
+			for (Character d : m.keySet()) {
+				x = Math.max(x, d);
+			}
+			r[0] = 3;
+			r[1] = x;
+		}
+		
+		return r;
 	}
 	
 	// One Pair: Two cards of the same value.
-	public static boolean OP(String[] h) {
+	public static int[] OP(String[] h) {
+		int[] r = new int[2];
+		r[0] = -1;
 		Map<Character, Integer> m = new HashMap<Character, Integer>();
 		Integer i;
 		for (String s : h) {
@@ -258,7 +316,15 @@ public class PokerHands {
 			m.put(s.charAt(0), i);
 		}
 		
-		return m.containsValue(2);
+		for (Character c : m.keySet()) {
+			if (m.get(c) == 2) {
+				r[0] = 2;
+				r[1] = c;
+				break;
+			}
+		}
+		
+		return r;
 	}
 
 	public static char hi(String[] h) {
